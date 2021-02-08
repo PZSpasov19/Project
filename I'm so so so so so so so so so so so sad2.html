@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title> I'm so so so so so so so so so so so sad </title> 
+
+<style>
+
+body {
+  height: 102vh;
+  width: 102vw;
+  margin: 0;
+}
+
+.holder {
+  height: 100%;
+  width: 100%;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  background-image: url(https://res.cloudinary.com/dfvyityr2/image/upload/v1589280447/cloud_c6ejfc.jpg);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+}
+
+.text {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-weight: 800;
+  font-size: 5rem;
+  text-transform: uppercase;
+  color: white;
+}
+
+span {
+  margin-bottom: 10px;
+  animation: 0.8s blink step-end infinite;
+}
+
+@keyframes blink {
+  from,
+  to {
+    color: transparent;
+  }
+  50% {
+    color: #fff;
+  }
+}
+
+</style>
+
+<body>
+
+
+
+<body>
+  <audio src="https://imsolitude.github.io/typewriter/keystroke.mp3" type="audio/mp3" id="myAudio"></audio>
+  <div class="holder">
+    <div class="text" id="text"></div><span class="text">|</span>
+  </div>
+</body>
+<script>
+
+let sound = document.getElementById("myAudio");
+sound.volume = 0.3;
+
+let div = document.getElementById("text");
+
+const letters = ["Y", "o", "u ", "a", "r", "e ", "m", "y ", "b", "e", "s", "t ", "f", "r", "i", "e", "n", "d", "s", "! ", "I ", "w", "i", "l", "l", " p", "r", "o", "t", "e", "c", "t ", "y", "o", "u ", "i", "f", " I", " c", "a", "n", "!"];
+
+setTimeout(
+  () =>
+    letters.forEach((letter, i) => {
+      setTimeout(() => {
+        div.innerHTML += letter;
+        sound.play();
+      }, i * 500);
+    }),
+  2800
+);
+
+</script>
+
+</body>
+
+
+</html>

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title> I'm so so so so so so so so so so so sad6 </title>
+<style>
+@keyframes glow {
+  0% {
+    filter: drop-shadow(0 0 3vw rgba(255, 100, 255, 0.8));
+    margin-top: 2%;
+  }
+  100% {
+    filter: drop-shadow(0 0 3.25vw #ff64ff) drop-shadow(0 0 3.25vw blue);
+    margin-top: 0%;
+  }
+}
+@keyframes arm1 {
+  0% {
+    transform: rotate(12deg);
+  }
+  100% {
+    transform: rotate(-12deg);
+  }
+}
+@keyframes arm2 {
+  0% {
+    transform: rotate(12deg);
+  }
+  100% {
+    transform: rotate(-12deg);
+  }
+}
+#boo {
+  position: absolute;
+  top: 25vh;
+  left: 10vw;
+  opacity: 0;
+}
+#boo h1 {
+  color: #fff;
+  font-size: 6vw;
+  font-family: "Luckiest Guy", cursive;
+}
+
+#ghost {
+  position: relative;
+  width: 44vw;
+  max-width: 44vh;
+  height: 66vw;
+  max-height: 66vh;
+  background: #000;
+  border-radius: 20vw 20vw 0 0;
+  animation: glow 0.4s linear 0s infinite alternate;
+}
+#ghost .eyes {
+  position: relative;
+  z-index: 1;
+  transform: translate(-10%, -10%);
+  display: flex;
+  justify-content: space-around;
+  margin-top: 33.333%;
+  width: 44vw;
+  max-width: 44vh;
+  height: calc(44vw * .4);
+  max-height: calc(44vh * .4);
+}
+#ghost .eyes .eye {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 40%;
+  height: 100%;
+  background: #fff;
+  border-radius: 50%;
+  filter: drop-shadow(0 0 1vw #fff);
+}
+#ghost .eyes .eye:before {
+  content: "";
+  width: 50%;
+  height: 50%;
+  background: #000;
+  border-radius: 50%;
+}
+#ghost .eyes .eye:after {
+  content: "";
+  position: absolute;
+  top: 33.333%;
+  left: 33.333%;
+  width: 20%;
+  height: 20%;
+  background: rgba(255, 255, 255, 0.75);
+  border-radius: 50%;
+  filter: drop-shadow(0 0 1vw #fff);
+}
+#ghost .arms {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: space-between;
+  width: 66vw;
+  max-width: 66vh;
+  height: 11vw;
+  max-height: 11vh;
+}
+#ghost .arms .arm {
+  width: 22vw;
+  max-width: 22vh;
+  height: calc(44vw / 3);
+  max-height: calc(44vh / 3);
+  background: #000;
+  border-radius: 5.5vw;
+}
+#ghost .arms #arm1 {
+  animation: arm1 0.4s linear 0s infinite alternate;
+}
+#ghost .arms #arm2 {
+  animation: arm2 0.4s linear 0.2s infinite alternate;
+}
+#ghost .waves {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translate(-50%, 50%);
+  display: flex;
+  justify-content: space-around;
+  margin-top: calc(44vh * .333);
+  width: 44vw;
+  max-width: 44vh;
+  height: calc(44vw * .333);
+  max-height: calc(44vh * .333);
+}
+#ghost .waves .wave {
+  width: 33.333%;
+  height: 100%;
+  background: #000;
+  border-radius: 50%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  height: 100vh;
+  background: radial-gradient(#003, #000);
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.reference {
+  position: absolute;
+  right: 24px;
+  bottom: 24px;
+  color: #fff;
+  font-family: arial;
+  text-decoration: none;
+}
+</style>
+</head>
+
+<body>
+
+
+<div id="boo"> 
+    <h1>😱 Boo </h1>
+  </div>
+  <div id="ghost">
+    <div class="eyes"> 
+      <div class="eye" id="eye1"></div>
+      <div class="eye" id="eye2"></div>
+    </div>
+    <div class="arms">
+      <div class="arm" id="arm1"></div>
+      <div class="arm" id="arm2"></div>
+    </div>
+    <div class="waves">
+      <div class="wave"></div>
+      <div class="wave"></div>
+      <div class="wave"></div>
+    </div>
+
+<script> 
+
+
+const GHOST = document.querySelector("#ghost")
+const EYE1 = document.querySelector("#eye1")
+const EYE2 = document.querySelector("#eye2")
+
+
+const getMousePos = (event) => {
+  
+
+  const MOUSE_X = Math.round(
+    (event.clientX / window.innerWidth/2 * 100)/(-2.5),0
+  )
+  
+  
+  const MOUSE_Y = Math.round(
+    (event.clientY / window.innerHeight * 100)/(-2.5),0
+  )
+  
+
+  GHOST.style.transform = "translate(-20%,-40%)";
+  GHOST.style.bottom = MOUSE_Y + "%";
+  GHOST.style.right = MOUSE_X + "%";
+  GHOST.style.opacity =  (MOUSE_X*(-5))/100;
+  
+
+  EYE1.style.bottom = MOUSE_Y + "%";
+  EYE1.style.right = MOUSE_X + "%";
+  
+
+  EYE2.style.bottom = MOUSE_Y + "%";
+  EYE2.style.right = MOUSE_X + "%";
+  
+
+  if (MOUSE_X < -16) {
+      document.querySelector("#boo").style.opacity = 1;
+  } else {
+      document.querySelector("#boo").style.opacity = 0;
+  }
+  
+};
+
+
+document.onmousemove = getMousePos;
+
+</script>
+
+</body>
+</html>    

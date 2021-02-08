@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title> I'm sad14 </title> 
+
+<style>
+canvas {
+  width: 100%;
+  height: 100%;
+}
+	
+</style>
+
+</head>
+
+<body>
+	
+<canvas onclick="para()"></canvas>
+
+<script>
+
+var canvas,ctx,count,gime,xtank,ytank,ctank;
+var gsoku,gdis,gpow,gnoko,gt1,gt2,gt3,typearr;
+
+window.onload=function(){
+    var a,b;
+    canvas = document.getElementsByTagName('canvas')[0],
+    ctx = canvas.getContext('2d');
+    canvas.width=canvas.height=400;
+    ctx.fillRect(0,0,400,400);
+    gime=ctx.getImageData(0,0,400,400);
+
+    try{
+        a=new Uint8Array(2);
+        typearr=1;
+    }catch(er){
+        typearr=0;
+    }
+    
+    count=15;
+    
+    xtank=dubar(400,400);
+    ytank=dubar(400,400);
+    for(a=0;a<400;a++){
+        for(b=0;b<400;b++){
+            xtank[a][b]=b;
+            ytank[a][b]=a;
+        }
+    }
+    
+    a=[
+        [0,0,0],[155,82,0],[255,235,0],[155,82,0],[100,0,0],[0,0,0]
+    ];
+        
+    ctank=[];
+    for(b=0;b<10000;b++){
+        c=b/400;c=c%2;if(c>1)c=2-c;
+        ctank[b]=gra(c,a);
+    }
+    
+    gsoku=0.3;
+    gdis=0.00003;
+    gpow=0.15;
+    gnoko=0.02;
+    gt1=13;
+    gt2=19;
+    gt3=11;
+    gsoku=0.3;
+    gpow=0.09;
+pent();
+};
+
+function para(){
+    gsoku=0.3+Math.random()*0.2;
+    gdis=0.00003+Math.random()*0.00004;
+    gpow=0.08+Math.random()*0.04;
+    gt1=7+Math.random()*8;
+    gt3=9+Math.random()*10;
+}
+
+function gra(atai,col){
+    var a,b,c,d;
+    var c1,c2,c3,N1,N2;
+    
+    if(atai<0)atai=0;
+    if(atai>1)atai=1;
+    atai*=col.length;
+    N1=Math.floor(atai);
+    N2=N1+1;
+    if(N1>=col.length)N1=col.length-1;
+    if(N2>=col.length)N2=col.length-1;
+    a=atai%1;
+    a=0.5-Math.cos(a*Math.PI)/2;
+    b=1-a;
+    
+    c1=col[N1][0]*b+col[N2][0]*a;
+    c2=col[N1][1]*b+col[N2][1]*a;
+    c3=col[N1][2]*b+col[N2][2]*a;
+    return [c1,c2,c3];
+}
+
+
+
+function pent(fr){
+    var a,b,c,x,y,x1,y1,iti,dt,msin,mcos,gpow2,gnoko2;
+    var tx,ty,tx2,ty2,han,han2;
+    gpow2=1-gpow/2;
+    gnoko2=1-gnoko;
+    
+    a=0.1+Math.sin(count/gt1)*0.055;
+    a*=gsoku;
+    msin=Math.sin(a);
+    mcos=Math.cos(a);
+    
+    a=count/gt2;
+    ty=200+Math.cos(a)*20;
+    tx=200+Math.sin(a)*20;
+    
+    a=count/gt3;
+    b=0.95+Math.sin(count/7)*0.1;
+    ty2=Math.cos(a)*12*b;
+    tx2=Math.sin(a)*12*b;
+    
+    iti=0;
+    dt=gime.data;
+    for(a=0;a<400;a++){
+        for(b=0;b<400;b++){
+            x=xtank[a][b];y=ytank[a][b];
+            x=x*gnoko2+b*gnoko;y=y*gnoko2+a*gnoko;
+            x-=tx;y-=ty;
+            
+            x1=mcos*x-msin*y;
+            y1=msin*x+mcos*y;
+            han2=(x1*x1+y1*y1);
+            x1-=tx2;y1-=ty2;
+            han=(x1*x1+y1*y1)*gdis;
+            
+            if(fr){
+            c=Math.floor(han2*0.1);
+            if(c>=ctank.length)c=ctank.length-1;
+            c=ctank[c];
+            dt[iti]=c[0];
+            dt[iti+1]=c[1];
+            dt[iti+2]=c[2];
+            iti+=4;
+            }
+            
+            c=gpow2+Math.sin(han)*gpow;
+            xtank[a][b]=x1*c+tx;
+            ytank[a][b]=y1*c+ty;
+        }
+    }
+    count++;
+ctx.putImageData(gime,0,0);
+requestAnimationFrame(pent);
+}
+
+
+function dubar(r1,r2){
+    var a,b;
+    a=new Array(r1);
+    if(typearr){
+        for(b=0;b<r1;b++)a[b]=new Float32Array(r2);
+    }else{
+        for(b=0;b<r1;b++)a[b]=[];
+    }
+    return a;
+}
+
+</script>
+
+</body>
+
+
+</html>

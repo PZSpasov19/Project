@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title> I'm sad8 </title> 
+
+<style>
+
+body {
+  margin: 0;
+  overflow: hidden;
+  background: #111;
+}
+	
+	
+</style>
+
+</head>
+
+<body>
+	
+   <canvas></canvas>
+	<embed src="Kwabs-Walk.mp3" autostart="true" loop="true"
+	width="2" height="0">
+	</embed>
+	<noembed>
+	<bgsound src="Kwabs-Walk.mp3" loop="infinite">
+	</noembed>
+	
+<script>
+"use strict";
+var canvas = document.querySelector('canvas');
+canvas.width = innerWidth;
+canvas.height = innerHeight;
+
+var c = canvas.getContext('2d');
+
+
+var earth = [
+'rgba(0, 38, 28, x)', 
+'rgba(4, 76, 41, x)',
+'rgba(22, 127, 57, x)',
+'rgba(69, 191, 85, x)',
+'rgba(150, 237, 137, x)',
+];
+
+
+var fire = [
+'rgba(242, 193, 102, x)', 
+'rgba(242, 134, 39, x)',
+'rgba(217, 63, 7, x)',
+'rgba(140, 29, 4, x)',
+'rgba(65, 15, 4, x)',
+];
+
+
+var water = [
+'rgba(0, 48, 90, x)', 
+'rgba(0, 75, 141, x)',
+'rgba(0, 116, 217, x)',
+'rgba(65, 147, 217, x)',
+'rgba(122, 186, 242, x)',
+];
+
+
+var colorArray = [earth, fire, water];
+
+
+var colors = colorArray[0];
+
+function Circle(x, y, vx, vy, r, growth) {
+	this.x = x;
+	this.y = y;
+	this.vx = vx;
+	this.vy = vy;
+	this.r = r;
+	this.color = colors[Math.floor(Math.random() * colors.length)];
+	this.alpha = 1;
+
+	this.draw = function() {
+		c.beginPath();
+		c.strokeStyle = this.color.replace('x', + this.alpha);
+		c.arc(this.x, this.y, this.r, Math.PI * 2, false);
+		c.lineWidth = 2;
+		c.stroke();
+		c.fillStyle = 'transparent';
+		c.fill();
+	}
+
+	this.update = function() {
+		this.x += this.vx;
+		this.y += this.vy;
+		this.alpha -= 0.015;
+		this.r += growth;
+		this.draw();
+	}
+}
+
+
+var circles = [];
+
+
+var mouse = {
+	x: innerWidth / 2,
+	y: innerHeight / 2
+};
+
+
+window.addEventListener('mousemove', function(e) {
+	mouse.x = e.x;
+	mouse.y = e.y;
+});
+
+
+window.addEventListener('click', function() {
+	colorArray.push(colorArray.shift());
+	colors = colorArray[0];
+	circles.push(new Circle(mouse.x, mouse.y, 0, 0, 10, 20));
+});
+
+
+window.addEventListener('resize', function() {
+	canvas.width = innerWidth;
+	canvas.height = innerHeight;
+});
+
+function animate() {
+	requestAnimationFrame(animate);
+	c.clearRect(0, 0, innerWidth, innerHeight);
+
+	var vx = (Math.random() - 0.5) * 5 + (Math.random() < 0.5 ? -2 : 2);
+	var vy = (Math.random() - 0.5) * 5 + (Math.random() < 0.5 ? -2 : 2);
+	var r = Math.random() * 20 + 30;
+	circles.push(new Circle(mouse.x, mouse.y, vx, vy, r, -0.5));
+	
+	for (let i = 0; i < circles.length; ++i) {
+		circles[i].update();
+		if (circles[i].alpha < 0 || circles[i].r < 3) {
+			circles.splice(i, 1);
+		}
+	}
+}
+
+animate();
+</script>
+  
+  
+
+	
+</body>
+
+
+</html>

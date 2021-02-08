@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title> I'm so so so so so so so so so so so so so so so so so so so so so so so so so so so so so so so so so so so so so sad3 </title>
+<style>
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+*::before, *::after {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+}
+
+.visualizer {
+  width: 100%;
+  height: 100vh;
+  position: relative;
+  background-image: linear-gradient(45.34deg, #EA52F8 5.66%, #0066FF 94.35%);
+  overflow: hidden;
+}
+.visualizer input[type=file] {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 20px;
+}
+.visualizer audio {
+  width: 80%;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 20px;
+}
+.visualizer .circle {
+  z-index: 2;
+  border-radius: 50%;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  animation: anime 30s linear infinite alternate;
+}
+@keyframes anime {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+.visualizer .circle .barParent {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.visualizer .circle .barParent .bar {
+  height: 0;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.visualizer .circle.outer {
+  width: 250px;
+  height: 250px;
+}
+.visualizer .circle.outer .barParent .bar {
+  bottom: 100%;
+}
+.visualizer .circle.inner {
+  width: 120px;
+  height: 120px;
+  overflow: hidden;
+}
+.visualizer .circle.inner .barParent .bar {
+  top: 0;
+}
+.visualizer canvas {
+  width: 100%;
+  height: 300px;
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1;
+}
+</style>
+</head>
+<body>
+    <div class="visualizer">
+        <input type="file" />
+        <div class="circle outer"></div>
+        <div class="circle inner"></div>
+        <canvas></canvas>
+     </div>
+<script>
+ class Visualizer{
+    constructor(outerCircle,innerCircle,canvas,audio,config){
+        this.outerCircle = outerCircle ;
+        this.innerCircle = innerCircle ;
+        this.canvas = canvas ;
+        this.audio = audio ;
+        config = config || {} ;
+        this.fftSize = config.fftSize || 2048 ;
+        this.outerBarsNum = config.outerBarsNum || 50 ;
+        this.innerBarsNum = config.innerBarsNum || 50 ;
+        this.lineNum = config.lineNum || 100 ;
+        this.outerBarWidth = config.outerBadWidth || 4 ;
+        this.innerBarWidth = config.innerBadWidth || 4 ;
+        this.innerBarsThreshold = config.innerBarsThreshold || this.innerCircle.offsetHeight / 2 ;
+        this.lineWidth = config.lineWidth || 2 ;
+        this.outerBarColors = config.outerBarColors || [{color:'black',offset:'0%'},{color:'black',offset:'100%'}] ;
+        this.innerBarColors = config.innerBarColors || [{color:'black',offset:'0%'},{color:'black',offset:'100%'}] ;
+        this.lineColor = config.lineColor || 'black' ;
+        this.outerCircleColor = config.outerCircleColor || 'transparent' ;
+        this.innerCircleColor = config.innerCircleColor || 'transparent' ;
+        this.outerBarsMultiplier = config.outerBarsMultiplier || 1 ;
+        this.innerBarsMultiplier = config.innerBarsMultiplier || 1 ;
+        this.linesMultiplier = config.linesMultiplier || 1 ;
+        this.canvasWidth = config.canvasWidth || 500 ;
+        this.canvasHeight = config.canvasHeight || 300 ;
+        this.lineWaveLength = config.lineWaveLength || 1 ;
+        this.initCircles() ;
+        this.initCanvas() ;
+        this.initAudioApi() ;
+    }
+    initCircles(){
+        //create outer circle bars
+        for(let i=0 ; i<this.outerBarsNum ; i++){
+            const barParent = document.createElement('DIV') ;
+            barParent.classList.add('barParent') ;
+            barParent.style.transform = `rotate(${i*(360/this.outerBarsNum)}deg)` ;
+            const bar = document.createElement('DIV') ;
+            bar.classList.add('bar') ;
+            bar.style.width = `${this.outerBarWidth}px` ;
+            let gradient = '' ;
+            this.outerBarColors.forEach((color,i)=>{
+                gradient += `${color.color} ${color.offset}` ;
+                if(i!=this.outerBarColors.length-1) gradient+= ' , ' ;
+            })
+            bar.style.backgroundImage = `linear-gradient(to top,${gradient})` ;
+            barParent.appendChild(bar) ;
+            this.outerCircle.appendChild(barParent) ;
+        }
+        this.outerCircleBars = this.outerCircle.querySelectorAll('.bar') ;
+        this.outerCircle.style.backgroundColor = this.outerCircleColor ;
+        //create inner circle bars
+        for(let i=0 ; i<this.innerBarsNum ; i++){
+            const barParent = document.createElement('DIV') ;
+            barParent.classList.add('barParent') ;
+            barParent.style.transform = `rotate(${i*(360/this.innerBarsNum)}deg)` ;
+            const bar = document.createElement('DIV') ;
+            bar.classList.add('bar') ;
+            bar.style.width = `${this.innerBarWidth}px` ;
+            let gradient = '' ;
+            this.innerBarColors.forEach((color,i)=>{
+                gradient += `${color.color} ${color.offset}` ;
+                if(i!=this.innerBarColors.length-1) gradient+= ' , ' ;
+            })
+            bar.style.backgroundImage = `linear-gradient(to bottom,${gradient})` ;
+            barParent.appendChild(bar) ;
+            this.innerCircle.appendChild(barParent) ;
+        }
+        this.innerCircle.style.backgroundColor = this.innerCircleColor ;
+        this.innerCircleBars = this.innerCircle.querySelectorAll('.bar') ;
+    }
+    initCanvas(){
+        this.ctx = this.canvas.getContext('2d') ;
+        this.canvas.width = this.canvasWidth ;
+        this.canvas.height = this.canvasHeight ;
+        this.ctx.beginPath() ;
+        this.ctx.lineWidth = this.lineWidth ;
+        this.ctx.moveTo(0,this.canvas.height/2) ;
+        this.ctx.strokeStyle = this.lineColor ;
+        for(let i=0 ; i<this.lineNum ; i++) {     
+            this.ctx.lineTo(i*this.canvas.width/this.lineNum,this.canvas.height/2+(0*Math.sin(i*this.lineWaveLength))) ;
+        }
+        this.ctx.stroke() ;
+    }
+    initAudioApi(){
+        const audioContext = new AudioContext() ;
+        this.analyzer = audioContext.createAnalyser() ;
+        const audioSrc = audioContext.createMediaElementSource(this.audio) ;
+        audioSrc.connect(this.analyzer) ;
+        this.analyzer.connect(audioContext.destination) ;
+        this.analyzer.fftSize = this.fftSize ;
+    }
+    getFreqData(){
+        const arr = new Uint8Array(this.analyzer.frequencyBinCount) ;
+        this.analyzer.getByteFrequencyData(arr) ;
+        return arr ;
+    }
+    animate(){
+        const freqData = this.getFreqData() ;
+        this.outerCircleBars.forEach((bar,i)=>bar.style.height = `${freqData[i]*this.outerBarsMultiplier}px`);
+        this.innerCircleBars.forEach((bar,i)=>bar.style.height = `${freqData[i]*this.innerBarsMultiplier}px`) ;
+        //canvas 
+        this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height) ;
+        this.ctx.beginPath() ;
+        this.ctx.lineWidth = this.lineWidth ;
+        this.ctx.moveTo(0,this.canvas.height/2) ;
+        this.ctx.strokeStyle = this.lineColor ;
+        for(let i=0 ; i<this.lineNum ; i++) {     
+            this.ctx.lineTo(i*this.canvas.width/this.lineNum,this.canvas.height/2+(freqData[i]*this.linesMultiplier*Math.sin(i*this.lineWaveLength))) ;
+        }
+        this.ctx.stroke() ;
+        //-------------------------
+        requestAnimationFrame(this.animate.bind(this)) ;
+    }
+}
+const fileInput = document.querySelector('input[type="file"]') ;
+fileInput.addEventListener('change',e=>{
+    const file = e.target.files[0] ; 
+    const fr = new FileReader() ; 
+    fr.readAsDataURL(file) ;
+    fr.addEventListener('load',e=>{
+        const audio = document.createElement('audio') ;
+        audio.src = e.target.result ;
+        audio.controls = 'true' ;
+        audio.autoplay = 'true' ;
+        audio.loop = 'true' ;
+        document.querySelector('.visualizer').appendChild(audio) ;
+        const visualizer = new Visualizer(
+            document.querySelector('.circle.outer'),
+            document.querySelector('.circle.inner'),
+            document.querySelector('canvas'),
+            document.querySelector('audio'),
+            visualizerConfig
+        )
+        visualizer.animate() ;
+    })
+
+})
+
+const visualizerConfig = {
+    fftSize: 4096,
+    outerBarsNum: 100,
+    outerBadWidth: 4,
+    outerBarColors: [
+        {color:'rgb(255,255,255)',offset:'20%'},
+        {color:'rgb(200,200,200)',offset:'80%'}
+    ],
+    outerCircleColor: 'royalblue',
+    outerBarsMultiplier: .3,
+    innerBarsNum: 80, 
+    innerBadWidth: 2.5,
+    innerBarColors:[
+        {color:'rgb(255, 82, 168)',offset:'0%'},
+        {color:'rgb(177, 118, 240)',offset:'60%'}
+    ],
+    innerCircleColor: 'white',
+    innerBarsMultiplier: .2,
+    canvasWidth: window.innerWidth,
+    canvasHeight: 300,
+    lineNum: window.innerWidth/2,
+    lineWidth: 3,
+    lineColor: 'white' ,
+    linesMultiplier: .3,   
+    lineWaveLength: .02 //try .001 , .01 , .1 , .5 , .7 , 1 , 2
+}
+</script>
+
+</body>
+</html>
